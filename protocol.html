@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Protocol</title>
+    <style>
+        :root {
+            --bg: #050505;
+            --surface: #121212;
+            --surface-alt: #1a1a1a;
+            --border: #333;
+            --text-main: #e0e0e0;
+            --text-muted: #888;
+            --accent-gold: #D4AF37;
+            --accent-red: #8a2a2a;
+            --accent-blue: #4a6fa5;
+            --accent-green: #2a5a3a;
+            --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --font-serif: "Georgia", serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background-color: #000;
+            color: var(--text-main);
+            font-family: var(--font-stack);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        #app-frame {
+            width: 100%;
+            max-width: 600px;
+            height: 100%;
+            position: relative;
+            background-color: var(--bg);
+            box-shadow: 0 0 40px rgba(0,0,0,0.5);
+        }
+
+        .screen {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            padding: 20px;
+            padding-bottom: 80px; 
+            z-index: 10;
+            scrollbar-width: none;
+        }
+        .screen::-webkit-scrollbar { display: none; }
+        .hidden { display: none !important; }
+
+        h1 { font-size: 1.8rem; letter-spacing: -0.5px; margin-bottom: 5px; color: #fff; text-align: center; }
+        .subtitle { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 1px; text-align: center; }
+        
+        h2 { font-size: 1.6rem; color: #fff; margin-bottom: 10px; line-height: 1.2; }
+        h3 { font-size: 0.85rem; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 1px; margin-top: 30px; margin-bottom: 10px; border-bottom: 1px solid #222; padding-bottom: 5px; }
+        
+        p { line-height: 1.6; margin-bottom: 15px; color: #ccc; font-size: 1.05rem; }
+        
+        .tagline { font-family: var(--font-serif); font-style: italic; color: #fff; font-size: 1.2rem; margin-bottom: 20px; opacity: 0.9; }
+
+        .commitment-card {
+            background: var(--surface);
+            border: 1px solid var(--accent-gold);
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            display: none;
+        }
+        .commitment-card.active { display: block; }
+        .commitment-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-gold);
+            margin-bottom: 5px;
+        }
+        .commitment-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+        .commitment-text {
+            color: #ccc;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        .commitment-clear {
+            margin-top: 12px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            cursor: pointer;
+            padding: 5px 0;
+        }
+
+        .btn-main {
+            display: block;
+            width: 100%;
+            padding: 22px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            margin-bottom: 15px;
+            text-align: left;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-main:active { background: var(--surface-alt); transform: scale(0.99); }
+        .btn-title { display: block; font-weight: 700; font-size: 1.1rem; margin-bottom: 4px; }
+        .btn-desc { display: block; font-size: 0.85rem; color: var(--text-muted); }
+
+        .btn-emergency {
+            border-color: var(--accent-red);
+            background: #1a0a0a;
+        }
+        .btn-emergency .btn-title { color: #ff8888; }
+
+        .btn-back {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 15px 0;
+            margin-bottom: 10px;
+            text-align: left;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        .btn-back:before { content: "←"; margin-right: 8px; }
+
+        .btn-commit {
+            background: var(--accent-gold);
+            color: #000;
+            font-weight: 700;
+            border: none;
+            padding: 18px;
+            border-radius: 8px;
+            width: 100%;
+            margin-top: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .btn-commit:active { transform: scale(0.98); }
+
+        ul { list-style: none; margin-bottom: 20px; }
+        li { 
+            padding: 10px 0; 
+            border-bottom: 1px solid #1a1a1a; 
+            position: relative; 
+            padding-left: 20px;
+            color: #ccc;
+            line-height: 1.5;
+        }
+        li:before { content: "•"; color: var(--text-muted); position: absolute; left: 0; }
+        li:last-child { border-bottom: none; }
+
+        .content-block {
+            margin-bottom: 40px;
+        }
+        
+        .distortion-box {
+            background: #1a1515;
+            border-left: 3px solid var(--accent-red);
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .intervention-box {
+            background: #15181a;
+            border-left: 3px solid var(--accent-blue);
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .practice-box {
+            background: #151a15;
+            border-left: 3px solid var(--accent-green);
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .reality-box {
+            border: 1px solid var(--border);
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            margin-top: 40px;
+            background: var(--surface);
+        }
+        .reality-quote {
+            font-family: var(--font-serif);
+            font-style: italic;
+            font-size: 1.1rem;
+            color: #fff;
+        }
+
+        .step-card {
+            background: var(--surface);
+            border: 1px solid #333;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+        }
+        .step-num { color: var(--accent-red); font-weight: 700; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 10px; display: block; }
+        .copy-box {
+            background: #2a1a1a;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #ffcccc;
+            border: 1px dashed #5a2a2a;
+        }
+
+        .template-content { display: none; }
+
+    </style>
+</head>
+<body>
+
+<div id="app-frame">
+
+    <!-- HOME SCREEN -->
+    <div id="screen-home" class="screen">
+        <div style="margin-top: 20px;">
+            <h1>Protocol</h1>
+            <div class="subtitle">Intention. Intervention. Stance.</div>
+        </div>
+
+        <div id="virtue-commitment" class="commitment-card">
+            <div class="commitment-label">Today's Virtue</div>
+            <div class="commitment-title" id="virtue-name"></div>
+            <div class="commitment-text" id="virtue-cue"></div>
+            <button class="commitment-clear" onclick="clearVirtue()">Clear</button>
+        </div>
+
+        <div id="avatar-commitment" class="commitment-card">
+            <div class="commitment-label">Current Avatar</div>
+            <div class="commitment-title" id="avatar-name"></div>
+            <div class="commitment-text" id="avatar-cue"></div>
+            <button class="commitment-clear" onclick="clearAvatar()">Clear</button>
+        </div>
+
+        <div style="margin: 10px 0 40px 0; text-align: center;">
+            <p style="font-size: 1.1rem; color: #fff;">What do you need?</p>
+        </div>
+
+        <button class="btn-main" onclick="openMenu('virtues')">
+            <span class="btn-title">Set Today's Virtue</span>
+            <span class="btn-desc">Commit to a practice</span>
+        </button>
+
+        <button class="btn-main" onclick="openMenu('avatars')">
+            <span class="btn-title">Choose Your Avatar</span>
+            <span class="btn-desc">Embody a stance</span>
+        </button>
+
+        <button class="btn-main" onclick="openMenu('hindrances')">
+            <span class="btn-title">Identify a Hindrance</span>
+            <span class="btn-desc">Diagnose and intervene</span>
+        </button>
+
+        <button class="btn-main btn-emergency" onclick="openDetail('emergency', 0)">
+            <span class="btn-title">Emergency Protocol</span>
+            <span class="btn-desc">When everything collapses</span>
+        </button>
+    </div>
+
+    <!-- MENU SCREEN -->
+    <div id="screen-menu" class="screen hidden">
+        <button class="btn-back" onclick="openScreen('screen-home')">Back</button>
+        <h1 id="menu-title"></h1>
+        <div class="subtitle" id="menu-subtitle"></div>
+        <div id="menu-list"></div>
+    </div>
+
+    <!-- DETAIL SCREEN -->
+    <div id="screen-detail" class="screen hidden">
+        <button class="btn-back" id="detail-back-btn">Back</button>
+        <div id="detail-content"></div>
+    </div>
+
+</div>
+
+<!-- HIDDEN TEMPLATES STORED IN DOM -->
+<div class="template-content">
+    
+    <!-- EMERGENCY -->
+    <div id="template-emergency">
+        <h1 style="color: #ff8888;">Emergency Protocol</h1>
+        <div class="subtitle">When everything collapses, return to what is real.</div>
+        <div class="step-card" style="border-left: 3px solid #ff8888;">
+            <span class="step-num">Step 1 — Call in a Witness</span>
+            <h2>Text a Truth Teller</h2>
+            <p>Do not stay alone with a collapsing mind. You do not need advice. You need a witness.</p>
+            <div class="copy-box">"I am stuck today. Witness requested. You do not need to fix anything."</div>
+        </div>
+        <div class="step-card">
+            <span class="step-num">Step 2 — Change the Scene</span>
+            <h2>Move Your Body</h2>
+            <ul>
+                <li>Leave the room you are in.</li>
+                <li>Step outside, even for a few minutes.</li>
+                <li>Take a slow walk with your camera.</li>
+            </ul>
+        </div>
+        <div class="step-card">
+            <span class="step-num">Step 3 — Ask What Is Real</span>
+            <h2>Collapse lives on untested stories.</h2>
+            <p>What is real right now? Not what might happen. Not what you fear.</p>
+        </div>
+        <div class="step-card">
+            <span class="step-num">Step 4 — Connect</span>
+            <h2>One Human Gesture</h2>
+            <div class="copy-box">"Thinking of you today. Hope you are well."</div>
+        </div>
+        <div class="step-card">
+            <span class="step-num">Step 5 — Anchored Action</span>
+            <h2>Prove You Have Choice</h2>
+            <ul>
+                <li>Move one object with intention.</li>
+                <li>Write one true sentence beginning with: "Right now I am..."</li>
+                <li>Take one photograph as evidence that you are here.</li>
+            </ul>
+        </div>
+        <div class="reality-box">
+            <div class="reality-quote">"This state is not the whole of me. I am here. I am connected. I can act from what is real."</div>
+        </div>
+    </div>
+
+    <!-- VIRTUES -->
+    <div id="template-virtue-discipline">
+        <div class="tagline">Build the structure that gives you freedom.</div>
+        <h2>Discipline</h2>
+        
+        <h3>Meaning</h3>
+        <p>The backbone of freedom: regular rituals (morning, craft time, reflection) that anchor your day, even when things are chaotic.</p>
+        
+        <div class="practice-box">
+            <h3>Today it might look like</h3>
+            <ul>
+                <li>Keeping your morning rhythm, even if it is shorter</li>
+                <li>Finishing one cycle before starting another</li>
+                <li>Returning to the plan instead of rewriting it</li>
+            </ul>
+        </div>
+        
+        <p><strong>Stoic parallel:</strong> Marcus Aurelius: duty comes before mood.</p>
+        
+        <div class="reality-box">
+            <div class="reality-quote">"What structure will free me today?"</div>
+        </div>
+    </div>
+
+    <div id="template-virtue-selfcontrol">
+        <div class="tagline">Choose clarity over impulse.</div>
+        <h2>Self-control</h2>
+        
+        <h3>Meaning</h3>
+        <p>Still the impulses of fear, self-doubt, or distraction and create space to choose with intention.</p>
+        
+        <div class="practice-box">
+            <h3>Today it might look like</h3>
+            <ul>
+                <li>Pausing before reacting</li>
+                <li>Not reaching for your usual distraction</li>
+                <li>Naming the impulse without obeying it</li>
+            </ul>
+        </div>
+        
+        <p><strong>Stoic parallel:</strong> Epictetus: mastery of self is real freedom.</p>
+        
+        <div class="reality-box">
+            <div class="reality-quote">"What reaction can I meet with steadiness?"</div>
+        </div>
+    </div>
+
+    <div id="template-virtue-modesty">
+        <div class="tagline">Let your work speak for you.</div>
+        <h2>Modesty</h2>
+        
+        <h3>Meaning</h3>
+        <p>Hold your ego lightly and let your craft and values speak louder than any need to impress.</p>
+        
+        <div class="practice-box">
+            <h3>Today it might look like</h3>
+            <ul>
+                <li>Doing the work without announcing it</li>
+                <li>Letting someone else take the spotlight</li>
+                <li>Not forcing an image or persona</li>
+            </ul>
+        </div>
+        
+        <p><strong>Stoic parallel:</strong> Marcus Aurelius: be good, do not talk about being good.</p>
+        
+        <div class="reality-box">
+            <div class="reality-quote">"What can I do today without needing credit?"</div>
+        </div>
+    </div>
+
+    <div id="template-virtue-compassion">
+        <div class="tagline">Support what is struggling, in you or someone else.</div>
+        <h2>Benevolence / Compassion</h2>
+        
+        <h3>Meaning</h3>
+        <p>Extend kindness toward your own patterns and toward others in your world and community.</p>
+        
+        <div class="practice-box">
+            <h3>Today it might look like</h3>
+            <ul>
+                <li>Softening the story you tell about yourself</li>
+                <li>Responding slowly instead of reacting</li>
+                <li>Giving someone your full attention without fixing</li>
+            </ul>
+        </div>
+        
+        <p><strong>Stoic parallel:</strong> Seneca: compassion builds strength, not softness.</p>
+        
+        <div class="reality-box">
+            <div class="reality-quote">"What would kindness look like right now?"</div>
+        </div>
+    </div>
+
+    <div id="template-virtue-humility">
+        <div class="tagline">Stay teachable.</div>
+        <h2>Humility</h2>
+        
+        <h3>Meaning</h3>
+        <p>Approach life and craft as a student, ready to learn, unlearn, and live with flaws, gaps, and uncertainty.</p>
+        
+        <div class="practice-box">
+            <h3>Today it might look like</h3>
+            <ul>
+                <li>Asking instead of assuming</li>
+                <li>Letting yourself be corrected</li>
+                <li>Saying "I don't know" without apology</li>
+            </ul>
+        </div>
+        
+        <p><strong>Stoic parallel:</strong> Epictetus: wisdom begins with recognizing how little you know.</p>
+        
+        <div class="reality-box">
+            <div class="reality-quote">"What can I learn in this moment?"</div>
+        </div>
+    </div>
+
+    <div id="template-virtue-respect">
+        <div class="tagline">Honor what matters.</div>
+        <h2>Respect</h2>
+        
+        <h3>Meaning</h3>
+        <p>Honor your inner truth, your values, your tools, and the people and traditions around you.</p>
+        
+        <div class="practice-box">
+            <h3>Today it might look like</h3>
+            <ul>
+                <li>Treating someone's time as valuable</li>
+                <li>Caring for your tools and environment</li>
+                <li>Speaking honestly without diminishing anyone</li>
+            </ul>
+        </div>
+        
+        <p><strong>Stoic parallel:</strong> Marcus Aurelius: treat others as fellow citizens of the same world.</p>
+        
+        <div class="reality-box">
+            <div class="reality-quote">"What deserves my full respect today?"</div>
+        </div>
+    </div>
+
+    <div id="template-virtue-integrity">
+        <div class="tagline">Let your inner compass lead.</div>
+        <h2>Righteousness (Integrity)</h2>
+        
+        <h3>Meaning</h3>
+        <p>Let your internal compass, your anchor map, and your values guide your decisions instead of fear, pressure, or anxiety.</p>
+        
+        <div class="practice-box">
+            <h3>Today it might look like</h3>
+            <ul>
+                <li>Choosing the option you will be proud of tonight</li>
+                <li>Closing one open loop</li>
+                <li>Refusing the shortcut that bends your values</li>
+            </ul>
+        </div>
+        
+        <p><strong>Stoic parallel:</strong> For the Stoics, integrity is the center of virtue.</p>
+        
+        <div class="reality-box">
+            <div class="reality-quote">"What choice keeps me aligned with myself?"</div>
+        </div>
+    </div>
+
+    <div id="template-virtue-trust">
+        <div class="tagline">Move with faith, not certainty.</div>
+        <h2>Trust</h2>
+        
+        <h3>Meaning</h3>
+        <p>Cultivate trust in yourself, in the process, in others, and in the longer arc of things, even before results show up.</p>
+        
+        <div class="practice-box">
+            <h3>Today it might look like</h3>
+            <ul>
+                <li>Taking the next step without overthinking</li>
+                <li>Letting someone support you</li>
+                <li>Believing the process is working even when you can't see it</li>
+            </ul>
+        </div>
+        
+        <p><strong>Stoic parallel:</strong> Cleanthes: follow where reason leads.</p>
+        
+        <div class="reality-box">
+            <div class="reality-quote">"What deserves my trust today?"</div>
+        </div>
+    </div>
+
+    <div id="template-virtue-loyalty">
+        <div class="tagline">Stay true to what and who you care about.</div>
+        <h2>Loyalty</h2>
+        
+        <h3>Meaning</h3>
+        <p>Commit to your values, your creative practice, your people, and the long-term projects that matter.</p>
+        
+        <div class="practice-box">
+            <h3>Today it might look like</h3>
+            <ul>
+                <li>Showing up for a promise you made to yourself</li>
+                <li>Being steady for someone who counts on you</li>
+                <li>Returning to Heart of Craft, Big Love, or The Open Lens</li>
+            </ul>
+        </div>
+        
+        <p><strong>Stoic parallel:</strong> Loyalty to virtue and one's role is a Stoic constant.</p>
+        
+        <div class="reality-box">
+            <div class="reality-quote">"What deserves my devotion today?"</div>
+        </div>
+    </div>
+
+    <div id="template-virtue-will">
+        <div class="tagline">Move with direction.</div>
+        <h2>Will (Strong Intent)</h2>
+        
+        <h3>Meaning</h3>
+        <p>Clear direction and the will to move through inertia, confusion, or fear, especially in seasons of transition.</p>
+        
+        <div class="practice-box">
+            <h3>Today it might look like</h3>
+            <ul>
+                <li>Taking one decisive step</li>
+                <li>Saying no to protect your yes</li>
+                <li>Choosing movement over rumination</li>
+            </ul>
+        </div>
+        
+        <p><strong>Stoic parallel:</strong> Epictetus: willing the right thing matters more than the outcome.</p>
+        
+        <div class="reality-box">
+            <div class="reality-quote">"What direction am I choosing right now?"</div>
+        </div>
+    </div>
+
+    <div id="template-virtue-perseverance">
+        <div class="tagline">Stay with the process, especially when it is slow.</div>
+        <h2>Perseverance</h2>
+        
+        <h3>Meaning</h3>
+        <p>Continue showing up even when progress is invisible.</p>
+        
+        <div class="practice-box">
+            <h3>Today it might look like</h3>
+            <ul>
+                <li>Returning after a setback</li>
+                <li>Showing up on a low-energy day</li>
+                <li>Letting consistency shape you</li>
+            </ul>
+        </div>
+        
+        <p><strong>Stoic parallel:</strong> Marcus Aurelius: obstacles become the way when you persist.</p>
+        
+        <div class="reality-box">
+            <div class="reality-quote">"Where do I need gentle endurance?"</div>
+        </div>
+    </div>
+
+    <div id="template-virtue-persistence">
+        <div class="tagline">Return, refine, repeat.</div>
+        <h2>Persistence</h2>
+        
+        <h3>Meaning</h3>
+        <p>Be willing to revisit and refine the work, the practice, the self — even when it gets tedious.</p>
+        
+        <div class="practice-box">
+            <h3>Today it might look like</h3>
+            <ul>
+                <li>Revisiting something you avoided</li>
+                <li>Improving one detail</li>
+                <li>Returning to fundamentals</li>
+            </ul>
+        </div>
+        
+        <p><strong>Stoic parallel:</strong> Seneca: repetition builds character.</p>
+        
+        <div class="reality-box">
+            <div class="reality-quote">"What deserves another honest attempt?"</div>
+        </div>
+    </div>
+
+    <div id="template-virtue-patience">
+        <div class="tagline">Let things take the time they need.</div>
+        <h2>Patience</h2>
+        
+        <h3>Meaning</h3>
+        <p>Allow craft, relationships, and emotions to unfold at their own pace instead of forcing clarity or success.</p>
+        
+        <div class="practice-box">
+            <h3>Today it might look like</h3>
+            <ul>
+                <li>Not forcing a decision</li>
+                <li>Allowing a pause</li>
+                <li>Letting a task or conversation unfold naturally</li>
+            </ul>
+        </div>
+        
+        <p><strong>Stoic parallel:</strong> Marcus Aurelius: nature rushes nothing.</p>
+        
+        <div class="reality-box">
+            <div class="reality-quote">"Where can I slow down?"</div>
+        </div>
+    </div>
+
+    <div id="template-virtue-courage">
+        <div class="tagline">Face what you fear with open eyes.</div>
+        <h2>Courage</h2>
+        
+        <h3>Meaning</h3>
+        <p>Move toward uncertainty, discomfort, and vulnerability — whether in creative leaps, honest reflection, or needed action.</p>
+        
+        <div class="practice-box">
+            <h3>Today it might look like</h3>
+            <ul>
+                <li>Reaching out instead of withdrawing</li>
+                <li>Doing the thing you keep postponing</li>
+                <li>Speaking a truth without protection</li>
+            </ul>
+        </div>
+        
+        <p><strong>Stoic parallel:</strong> Epictetus: courage is choosing character over comfort.</p>
+        
+        <div class="reality-box">
+            <div class="reality-quote">"What fear is pointing me forward?"</div>
+        </div>
+    </div>
+
+    <!-- AVATARS -->
+    <div id="template-avatar-scholar">
+        <div class="tagline">Architect of Continuity</div>
+        <h2>The Scholar</h2>
+        
+        <h3>When to Embody the Scholar</h3>
+        <ul>
+            <li>When fog obscures the thread of your work</li>
+            <li>When doubt tells you you are not making progress</li>
+            <li>When memory gaps leave you uncertain of what you have accomplished</li>
+            <li>Every evening (to document) and every morning (to retrieve)</li>
+        </ul>
+        
+        <h3>What the Scholar Does</h3>
+        <p>The Scholar does not rely on memory. He externalizes what would otherwise dissolve—facts, victories, lessons, commitments.</p>
+        <p>He builds the map so the Warrior does not wander. He preserves evidence so the Crafter does not doubt.</p>
+        
+        <div class="practice-box">
+            <h3>The Scholar's Practices</h3>
+            <ul>
+                <li><strong>Evening Ledger:</strong> Document the day before it dissolves. Facts, hindrances, victories, tomorrow's brief.</li>
+                <li><strong>Morning Briefing:</strong> Read last night's ledger. Retrieve the clarity. Prepare the day.</li>
+                <li><strong>Evidence Review:</strong> When doubt appears, return to documented truth. The record holds more than the feeling.</li>
+                <li><strong>Pattern Recognition:</strong> Weekly synthesis. What hindrance dominated? What worked? What trajectory is visible?</li>
+            </ul>
+        </div>
+        
+        <div class="reality-box">
+            <div class="reality-quote">"What truth will vanish unless I preserve it?"</div>
+        </div>
+    </div>
+
+    <div id="template-avatar-warrior">
+        <div class="tagline">Protector of Momentum</div>
+        <h2>The Warrior</h2>
+        
+        <h3>When to Embody the Warrior</h3>
+        <ul>
+            <li>When procrastination or sloth takes hold</li>
+            <li>When indecision or avoidance threatens the work</li>
+            <li>During work hours—the Warrior executes, does not contemplate</li>
+            <li>When the briefing is clear and action is needed</li>
+        </ul>
+        
+        <h3>What the Warrior Does</h3>
+        <p>The Warrior moves before motivation arrives. He protects momentum, guards against entropy, and clears the field so the Crafter can work.</p>
+        <p>He does not negotiate with resistance. He acts. Motion creates clarity, not the other way around.</p>
+        
+        <div class="practice-box">
+            <h3>The Warrior's Practices</h3>
+            <ul>
+                <li><strong>The Cold Start:</strong> Act within 5 seconds of recognizing what needs doing. No negotiation.</li>
+                <li><strong>The Closed Loop:</strong> Externalize every commitment immediately. Your word is law.</li>
+                <li><strong>Kung Fu:</strong> Every action is practice. The invoice, the email, the cleanup—all Kung Fu.</li>
+                <li><strong>Threshold Rituals:</strong> Mark entry into work (three breaths, intention) and exit (accomplishment noted, role released).</li>
+            </ul>
+        </div>
+        
+        <div class="reality-box">
+            <div class="reality-quote">"What is the next step?"</div>
+        </div>
+    </div>
+
+    <div id="template-avatar-crafter">
+        <div class="tagline">Alchemist of Presence</div>
+        <h2>The Crafter</h2>
+        
+        <h3>When to Embody the Crafter</h3>
+        <ul>
+            <li>During creative work and photography sessions</li>
+            <li>When connection with another person is needed</li>
+            <li>When full attention and receptivity are required</li>
+            <li>When authentic presence matters more than performance</li>
+        </ul>
+        
+        <h3>What the Crafter Does</h3>
+        <p>The Crafter does not manufacture. He witnesses. He holds space for what is alive in front of the lens and helps it unfold without interference.</p>
+        <p>He recognizes the moment between poses, the breath before the shift, the eyes when they stop trying. This is the work of presence.</p>
+        
+        <div class="practice-box">
+            <h3>The Crafter's Practices</h3>
+            <ul>
+                <li><strong>Mushin (no-mind):</strong> Clean perception. See what is there without adding story, judgment, or expectation.</li>
+                <li><strong>Sympatheia:</strong> Recognize shared humanity. You are not photographing a stranger—you are witnessing a variation of yourself.</li>
+                <li><strong>Patience:</strong> Wait for the authentic. Do not rush. Do not force. The real will emerge.</li>
+                <li><strong>Post-Session Capture:</strong> Immediately after, note what shifted, what surprised, what felt true. Preserve before it dissolves.</li>
+            </ul>
+        </div>
+        
+        <div class="reality-box">
+            <div class="reality-quote">"What is alive here, and how do I help it unfold?"</div>
+        </div>
+    </div>
+
+    <!-- HINDRANCES -->
+    <div id="template-hindrance-desire">
+        <div class="tagline">Escaping into imagined futures.</div>
+        <h2>Desire (Wanting)</h2>
+        
+        <div class="distortion-box">
+            <h3>The Distortion</h3>
+            <p>Your mind is telling you:</p>
+            <ul>
+                <li>"This fantasy means I am making progress"</li>
+                <li>"If I imagine it vividly enough, it will happen"</li>
+                <li>"Planning and dreaming are the same as doing"</li>
+                <li>"I need the right gear/moment/conditions before I can start"</li>
+            </ul>
+        </div>
+        
+        <h3>What Is Actually Happening</h3>
+        <p><strong>Stoic view:</strong> you are trying to control outcomes outside your power. The fantasy feels rewarding because it requires no risk, no effort, no possibility of failure.</p>
+        <p><strong>Shaolin view:</strong> energy is leaking outward into imagination. Attention has left the body, left the present, left what is actually yours to do.</p>
+        
+        <h3>Why This Shows Up</h3>
+        <p>Memory gaps make imagined futures more vivid than remembered past. Dopamine from fantasy temporarily fills uncertainty. Loneliness disguises itself as ambition.</p>
+        
+        <div class="intervention-box">
+            <h3>The Intervention</h3>
+            <p><strong>Stoic move:</strong> strip the fantasy of its false rewards. Return to what is actually yours to control—the work itself, not the outcome.</p>
+            <p><strong>Shaolin move:</strong> bring energy back into the body. Ground. Root. Act on something real.</p>
+            <ul>
+                <li>Do one unglamorous, reality-based task right now.</li>
+                <li>Not the exciting part—the boring part that requires actual effort.</li>
+                <li>Send one email. Organize one folder. Edit one image.</li>
+            </ul>
+        </div>
+        
+        <div class="reality-box">
+            <div class="reality-quote">"This is imagined. Here is what is real: [name one concrete thing in front of you right now]."</div>
+        </div>
+    </div>
+
+    <div id="template-hindrance-illwill">
+        <div class="tagline">Contraction, resentment, outward-directed frustration.</div>
+        <h2>Ill Will (Aversion)</h2>
+        
+        <div class="distortion-box">
+            <h3>The Distortion</h3>
+            <p>Your mind is telling you:</p>
+            <ul>
+                <li>"This person/situation is the problem"</li>
+                <li>"If I stay tight and defended, I am protecting myself"</li>
+                <li>"This feeling proves I am right to be angry"</li>
+                <li>"This resentment is justified and needs to be held"</li>
+            </ul>
+        </div>
+        
+        <h3>What Is Actually Happening</h3>
+        <p><strong>Stoic view:</strong> the external situation has not changed, but your internal state is consuming energy you need for the work. The story you are running amplifies the charge.</p>
+        <p><strong>Shaolin view:</strong> the body is holding tension—chest tight, jaw clenched, breath shallow. This is energy trapped, not energy protected.</p>
+        
+        <h3>Why This Shows Up</h3>
+        <p>Emotional residue from past trauma gets triggered. Fight/freeze wiring activates. Sensitivity to chaos or instability. Isolation amplifies resentment—no external perspective to interrupt the loop.</p>
+        
+        <div class="intervention-box">
+            <h3>The Intervention</h3>
+            <p><strong>Stoic move:</strong> separate the fact from the story. What actually happened versus what you are adding to it.</p>
+            <p><strong>Shaolin move:</strong> open the body where the mind has closed. Discharge the trapped energy through motion.</p>
+            <ul>
+                <li>Clean the studio vigorously—scrub, organize, move things.</li>
+                <li>Walk outside at a brisk pace for 10 minutes.</li>
+                <li>Do physical work that requires effort: lift, carry, rearrange.</li>
+            </ul>
+        </div>
+        
+        <div class="reality-box">
+            <div class="reality-quote">"The charge is moving. I am not the story."</div>
+        </div>
+    </div>
+
+    <div id="template-hindrance-sloth">
+        <div class="tagline">Collapse, heaviness, disconnection.</div>
+        <h2>Sloth/Torpor (Fog)</h2>
+        
+        <div class="distortion-box">
+            <h3>The Distortion</h3>
+            <p>Your mind is telling you:</p>
+            <ul>
+                <li>"I need to feel ready before I can act"</li>
+                <li>"This state means I am broken"</li>
+                <li>"Nothing will work anyway, so why try?"</li>
+                <li>"I should wait until the fog lifts on its own"</li>
+            </ul>
+        </div>
+        
+        <h3>What Is Actually Happening</h3>
+        <p><strong>Stoic view:</strong> you are mistaking a temporary state for a permanent truth. This is mood, not evidence. The fog is lying about your capability.</p>
+        <p><strong>Shaolin view:</strong> energy has stagnated. Executive function is offline. The background processes are not running. But action can restart them.</p>
+        
+        <h3>Why This Shows Up</h3>
+        <p>Memory gaps mean you cannot access past evidence of capability. Isolation deepens the fog. Long periods without external structure or connection. The state is environmental/neurological, not permanent.</p>
+        
+        <div class="intervention-box">
+            <h3>The Intervention</h3>
+            <p><strong>Warrior move:</strong> act before the mind negotiates. Move within 5 seconds.</p>
+            <p><strong>Shaolin move:</strong> change physical context. Break the environmental loop.</p>
+            <ul>
+                <li><strong>5-Minute Rule:</strong> Commit to only 5 minutes. Set timer. Start. Often becomes 20.</li>
+                <li><strong>External Contact:</strong> Text a Truth Teller: "I am in the fog. Not asking for solutions—just naming it."</li>
+                <li><strong>Change Context:</strong> Leave the room. Go outside. Break the loop.</li>
+                <li><strong>Smallest Action:</strong> Open one file. Write one sentence. Motion at any scale breaks stasis.</li>
+            </ul>
+        </div>
+        
+        <div class="reality-box">
+            <div class="reality-quote">"I do not need to feel ready. I need to start. The fog is weather, not truth."</div>
+        </div>
+    </div>
+
+    <div id="template-hindrance-restlessness">
+        <div class="tagline">Scattered attention and future projection.</div>
+        <h2>Restlessness (Worry)</h2>
+        
+        <div class="distortion-box">
+            <h3>The Distortion</h3>
+            <p>Your mind is telling you:</p>
+            <ul>
+                <li>"If I scan faster, I will find the answer"</li>
+                <li>"Speed means progress"</li>
+                <li>"I need to prepare for every possibility"</li>
+                <li>"Something is about to go wrong—I need to stay vigilant"</li>
+            </ul>
+        </div>
+        
+        <h3>What Is Actually Happening</h3>
+        <p><strong>Stoic view:</strong> you are trying to control what is not yours to control. The scanning for threats is finding (or inventing) threats. The urgency is not based in reality.</p>
+        <p><strong>Shaolin view:</strong> energy is rising into the head. Breath is shallow. Body is ungrounded. The nervous system is activated without an object.</p>
+        
+        <h3>Why This Shows Up</h3>
+        <p>Unstable routines leave the nervous system scanning. Business uncertainty triggers threat-detection mode. Lack of clear structure means everything feels urgent. Trying to solve problems that have not happened yet.</p>
+        
+        <div class="intervention-box">
+            <h3>The Intervention</h3>
+            <p><strong>Stoic move:</strong> identify what is actually yours to control. Choose one thing. Let everything else wait.</p>
+            <p><strong>Shaolin move:</strong> ground the energy. Slow the system. Return to physical present.</p>
+            <ul>
+                <li><strong>Tactile Anchor:</strong> Pick up the camera. Feel its weight for 30 seconds. This is real. This is here.</li>
+                <li><strong>Breath Extension:</strong> Inhale 4 counts. Exhale 7-8 counts. Do this 5 times.</li>
+                <li><strong>Narrow to ONE:</strong> Pick ONE task. Set timer for 15 minutes. Do only that.</li>
+                <li><strong>Name 3 Facts:</strong> Look around. Name three physical things you can see. Touch one.</li>
+            </ul>
+        </div>
+        
+        <div class="reality-box">
+            <div class="reality-quote">"I am here. This is now. One thing at a time."</div>
+        </div>
+    </div>
+
+    <div id="template-hindrance-doubt">
+        <div class="tagline">Internal collapse into uncertainty.</div>
+        <h2>Doubt (Self-Distrust)</h2>
+        
+        <div class="distortion-box">
+            <h3>The Distortion</h3>
+            <p>Doubt tells you this time is different, and you are smaller than the work in front of you.</p>
+            <p>Your mind is telling you: "I cannot do this." / "Other people are built for this. I am not."</p>
+            <p>It feels less like a thought and more like a verdict.</p>
+        </div>
+        
+        <h3>What Is Actually Happening</h3>
+        <p><strong>Stoic view:</strong> the feeling of doubt is not a measure of your ability. It is a measure of emotional weather. Mood is overwriting data.</p>
+        <p><strong>Shaolin view:</strong> the inner stance has folded. Chest caves, head drops, breath flattens. The body is practicing defeat before anything has happened.</p>
+        
+        <h3>Why This Shows Up</h3>
+        <p>Memory gaps mean you cannot access evidence of past capability. You are comparing yourself to imagined versions of yourself. Isolation amplifies doubt—no external mirror. Old trauma narratives resurface when vulnerable.</p>
+        
+        <div class="intervention-box">
+            <h3>The Intervention</h3>
+            <p><strong>Scholar move:</strong> go to the record, not the feeling. Let evidence, not emotion, have the final word.</p>
+            <p><strong>Shaolin move:</strong> adjust the stance. Lift the chest slightly. Lengthen the spine.</p>
+            <ul>
+                <li>Read one page from your ledger that proves you have shown up before.</li>
+                <li>Compare a ledger entry from 6 months ago to last week. The trajectory is visible.</li>
+                <li>Write a short list: "Times I did not quit" with three bullet points.</li>
+                <li>Do one small action you know you can complete. Let the completion prove the doubt is lying.</li>
+            </ul>
+        </div>
+        
+        <div class="reality-box">
+            <div class="reality-quote">"Doubt is a feeling, not a fact. My record holds more truth than this moment."</div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+const virtues = [
+    { 
+        name: "Discipline", 
+        tagline: "Build the structure that gives you freedom.",
+        cue: "What structure will free me today?",
+        template: "virtue-discipline"
+    },
+    { 
+        name: "Self-control", 
+        tagline: "Choose clarity over impulse.",
+        cue: "What reaction can I meet with steadiness?",
+        template: "virtue-selfcontrol"
+    },
+    { 
+        name: "Modesty", 
+        tagline: "Let your work speak for you.",
+        cue: "What can I do today without needing credit?",
+        template: "virtue-modesty"
+    },
+    { 
+        name: "Benevolence / Compassion", 
+        tagline: "Support what is struggling, in you or someone else.",
+        cue: "What would kindness look like right now?",
+        template: "virtue-compassion"
+    },
+    { 
+        name: "Humility", 
+        tagline: "Stay teachable.",
+        cue: "What can I learn in this moment?",
+        template: "virtue-humility"
+    },
+    { 
+        name: "Respect", 
+        tagline: "Honor what matters.",
+        cue: "What deserves my full respect today?",
+        template: "virtue-respect"
+    },
+    { 
+        name: "Righteousness (Integrity)", 
+        tagline: "Let your inner compass lead.",
+        cue: "What choice keeps me aligned with myself?",
+        template: "virtue-integrity"
+    },
+    { 
+        name: "Trust", 
+        tagline: "Move with faith, not certainty.",
+        cue: "What deserves my trust today?",
+        template: "virtue-trust"
+    },
+    { 
+        name: "Loyalty", 
+        tagline: "Stay true to what and who you care about.",
+        cue: "What deserves my devotion today?",
+        template: "virtue-loyalty"
+    },
+    { 
+        name: "Will (Strong Intent)", 
+        tagline: "Move with direction.",
+        cue: "What direction am I choosing right now?",
+        template: "virtue-will"
+    },
+    { 
+        name: "Perseverance", 
+        tagline: "Stay with the process, especially when it is slow.",
+        cue: "Where do I need gentle endurance?",
+        template: "virtue-perseverance"
+    },
+    { 
+        name: "Persistence", 
+        tagline: "Return, refine, repeat.",
+        cue: "What deserves another honest attempt?",
+        template: "virtue-persistence"
+    },
+    { 
+        name: "Patience", 
+        tagline: "Let things take the time they need.",
+        cue: "Where can I slow down?",
+        template: "virtue-patience"
+    },
+    { 
+        name: "Courage", 
+        tagline: "Face what you fear with open eyes.",
+        cue: "What fear is pointing me forward?",
+        template: "virtue-courage"
+    }
+];
+
+const avatars = [
+    {
+        name: "The Scholar",
+        tagline: "Architect of Continuity",
+        cue: "What truth will vanish unless I preserve it?",
+        template: "avatar-scholar"
+    },
+    {
+        name: "The Warrior",
+        tagline: "Protector of Momentum",
+        cue: "What is the next step?",
+        template: "avatar-warrior"
+    },
+    {
+        name: "The Crafter",
+        tagline: "Alchemist of Presence",
+        cue: "What is alive here, and how do I help it unfold?",
+        template: "avatar-crafter"
+    }
+];
+
+const hindrances = [
+    { name: "Desire (Wanting)", tagline: "Escaping into imagined futures.", template: "hindrance-desire" },
+    { name: "Ill Will (Aversion)", tagline: "Contraction, resentment.", template: "hindrance-illwill" },
+    { name: "Sloth/Torpor (Fog)", tagline: "Collapse, heaviness.", template: "hindrance-sloth" },
+    { name: "Restlessness (Worry)", tagline: "Scattered attention.", template: "hindrance-restlessness" },
+    { name: "Doubt (Self-Distrust)", tagline: "Internal collapse.", template: "hindrance-doubt" }
+];
+
+function openScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+    document.getElementById(id).classList.remove('hidden');
+    window.scrollTo(0,0);
+}
+
+function openMenu(type) {
+    const menuScreen = document.getElementById('screen-menu');
+    const menuTitle = document.getElementById('menu-title');
+    const menuSub = document.getElementById('menu-subtitle');
+    const menuList = document.getElementById('menu-list');
+    
+    menuList.innerHTML = "";
+
+    let items, titleText, subText;
+    
+    if (type === 'virtues') {
+        items = virtues;
+        titleText = "Virtue of the Day";
+        subText = "Commit to a practice";
+    } else if (type === 'avatars') {
+        items = avatars;
+        titleText = "Choose Avatar";
+        subText = "Embody a stance";
+    } else if (type === 'hindrances') {
+        items = hindrances;
+        titleText = "Identify Hindrance";
+        subText = "Diagnose the block";
+    }
+    
+    menuTitle.innerText = titleText;
+    menuSub.innerText = subText;
+    
+    items.forEach((item, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'btn-main';
+        btn.innerHTML = '<span class="btn-title">' + item.name + '</span><span class="btn-desc">' + item.tagline + '</span>';
+        btn.onclick = function() { openDetail(type.slice(0, -1), index); };
+        menuList.appendChild(btn);
+    });
+
+    openScreen('screen-menu');
+}
+
+function openDetail(type, index) {
+    const container = document.getElementById('detail-content');
+    let html = "";
+    let backAction = function() { openMenu(type + 's'); };
+    let commitBtn = "";
+
+    if (type === 'emergency') {
+        const template = document.getElementById('template-emergency');
+        html = template.innerHTML;
+        backAction = function() { openScreen('screen-home'); };
+    } else {
+        let data;
+        if (type === 'virtue') data = virtues[index];
+        if (type === 'avatar') data = avatars[index];
+        if (type === 'hindrance') data = hindrances[index];
+        
+        const template = document.getElementById('template-' + data.template);
+        if (template) {
+            html = template.innerHTML;
+        } else {
+            html = '<div class="tagline">' + data.tagline + '</div><h2>' + data.name + '</h2><p>Content coming soon.</p>';
+        }
+        
+        if (type === 'virtue') {
+            commitBtn = '<button class="btn-commit" onclick="commitVirtue(' + index + ')">Commit to This Virtue</button>';
+        } else if (type === 'avatar') {
+            commitBtn = '<button class="btn-commit" onclick="commitAvatar(' + index + ')">Embody This Avatar</button>';
+        }
+    }
+
+    container.innerHTML = html + commitBtn;
+    const backBtn = document.getElementById('detail-back-btn');
+    backBtn.onclick = backAction;
+    openScreen('screen-detail');
+}
+
+function commitVirtue(index) {
+    const virtue = virtues[index];
+    localStorage.setItem('activeVirtue', JSON.stringify({
+        name: virtue.name,
+        cue: virtue.cue,
+        date: new Date().toDateString()
+    }));
+    loadVirtue();
+    openScreen('screen-home');
+}
+
+function commitAvatar(index) {
+    const avatar = avatars[index];
+    localStorage.setItem('activeAvatar', JSON.stringify({
+        name: avatar.name,
+        cue: avatar.cue
+    }));
+    loadAvatar();
+    openScreen('screen-home');
+}
+
+function loadVirtue() {
+    const saved = localStorage.getItem('activeVirtue');
+    if (saved) {
+        const data = JSON.parse(saved);
+        if (data.date === new Date().toDateString()) {
+            document.getElementById('virtue-name').textContent = data.name;
+            document.getElementById('virtue-cue').textContent = data.cue;
+            document.getElementById('virtue-commitment').classList.add('active');
+        } else {
+            clearVirtue();
+        }
+    }
+}
+
+function loadAvatar() {
+    const saved = localStorage.getItem('activeAvatar');
+    if (saved) {
+        const data = JSON.parse(saved);
+        document.getElementById('avatar-name').textContent = data.name;
+        document.getElementById('avatar-cue').textContent = data.cue;
+        document.getElementById('avatar-commitment').classList.add('active');
+    }
+}
+
+function clearVirtue() {
+    localStorage.removeItem('activeVirtue');
+    document.getElementById('virtue-commitment').classList.remove('active');
+}
+
+function clearAvatar() {
+    localStorage.removeItem('activeAvatar');
+    document.getElementById('avatar-commitment').classList.remove('active');
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+    loadVirtue();
+    loadAvatar();
+});
+
+</script>
+</body>
+</html>
